@@ -17,8 +17,6 @@ class daughtrc_HW04App : public AppBasic {
 	void update();
 	void draw();
 
-	bool anythingHappen;
-
 };
 
 void daughtrc_HW04App::setup()
@@ -32,7 +30,6 @@ void daughtrc_HW04App::setup()
 	double y_value;
 	char separator;
 	int count = 0;
-	anythingHappen = false;
 
 	while (in.good()) {
 		Entry* e = new Entry();
@@ -46,7 +43,6 @@ void daughtrc_HW04App::setup()
 		in >> y_value;
 		storage[count].y = y_value;
 		count++;
-		anythingHappen = true;
 		console() << line;
 
 	}
@@ -69,12 +65,7 @@ void daughtrc_HW04App::update()
 void daughtrc_HW04App::draw()
 {
 	// clear out the window with black
-	if (anythingHappen == false) {
-		gl::clear( Color( 0, 0, 0 ) ); 
-	}
-	if (anythingHappen == true) {
-		gl::clear( Color(250, 250, 250) );
-	}
+	gl::clear( Color(250, 250, 250) );
 }
 
 CINDER_APP_BASIC( daughtrc_HW04App, RendererGl )

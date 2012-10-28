@@ -3,12 +3,11 @@
 
 class Node {
 public:
-	  node(Entry e);
+	  Node();
+	  Node(Entry* e1);
 
-	  node* left_;
-	  node* right_;
-	  bool isXlevel;
-
-	  static void insert();
+	  Node* left_;
+	  Node* right_;
+	  Entry* e;
 
 };
