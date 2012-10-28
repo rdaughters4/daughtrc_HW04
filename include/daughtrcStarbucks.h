@@ -12,7 +12,7 @@ public:
 
 	void build(Entry* c, int n);
 	Entry* getNearest(double x, double y);
-	Node* insert(Entry e, Node* r, bool isXlevel);
+	Node* insert(Entry* e, Node* r, bool isXlevel);
 	Entry* search(double x, double y, Node* r, bool isXlevel);
 
 };
