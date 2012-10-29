@@ -26,21 +26,21 @@ Node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXleve
 		return new Node(newEntry); 
 
 	// check for duplicates
-	if (currentNode->e->x == newEntry->x && currentNode->e->y == newEntry->y)
+	if ((abs(currentNode->e->x-newEntry->x) <= 0.00001) && (abs(currentNode->e->y-newEntry->y) <= 0.00001))
 		return currentNode;
 
 	// on x level and new x is less than current x
-	if ((isXlevel == true) && (newEntry->x < currentNode->e->x)) {
-		currentNode->left = insert(newEntry, currentNode, !isXlevel);
-	} else {
-		currentNode->right = insert(newEntry, currentNode, !isXlevel);
+	if (isXlevel) {
+		if (newEntry->x < currentNode->e->x)
+			currentNode->left = insert(newEntry, currentNode->left, !isXlevel);
+		else 
+			currentNode->right = insert(newEntry, currentNode->right, !isXlevel);
 	}
-
-	// on y level and new y is less than current y
-	if (isXlevel == false && newEntry->y < currentNode->e->y) {
-		currentNode->left = insert(newEntry, currentNode, !isXlevel);
-	} else {
-		currentNode->right = insert(newEntry, currentNode, !isXlevel);
+	else {
+		if (newEntry->y < currentNode->e->y)
+			currentNode->left = insert(newEntry, currentNode->left, !isXlevel);
+		else 
+			currentNode->right = insert(newEntry, currentNode->right, !isXlevel);
 	}
 
 	return currentNode;
@@ -57,7 +57,10 @@ void daughtrcStarbucks::build(Entry* e, int n) {
 	}
 	e = arrayData;
 
-	// create sentinel node
+	//randomize data
+	mix(e, n);
+
+	//create sentinel node
 	sentinel = new Node(e);
 
 	//build the k-d tree
@@ -120,6 +123,16 @@ Entry* daughtrcStarbucks::search(double x, double y, Node* currentNode, bool isX
 
 double daughtrcStarbucks::getDistance(double x, double y, Node* currentNode) {
 	return sqrt((x-currentNode->e->x)*(x-currentNode->e->x)+(y-currentNode->e->y)*(y-currentNode->e->y));
+}
+
+void daughtrcStarbucks::mix(Entry* entries, int length){
+	int pick = 0;
+	for(int i=0;i<length-1;i++){
+		pick = cinder::Rand::randInt(i+1,length);
+		Entry temp = entries[i];
+		entries[i] = entries[pick];
+		entries[pick] = temp;
+	}
 }
 
 
