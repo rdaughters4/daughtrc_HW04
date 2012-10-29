@@ -47,7 +47,6 @@ void daughtrc_HW04App::setup()
 		in >> y_value;
 		storage[count].y = y_value;
 		count++;
-		console() << line;
 
 	}
 
@@ -60,7 +59,7 @@ void daughtrc_HW04App::setup()
 	// build kd tree
 	myTree->build(list, count);
 
-	//console() << myTree->getNearest(0.741801952,0.79441292)->identifier << std::endl;
+	console() << myTree->getNearest(0.787693,0.62042)->identifier << std::endl;
 
 
 	

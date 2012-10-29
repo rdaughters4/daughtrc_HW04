@@ -69,54 +69,58 @@ void daughtrcStarbucks::build(Entry* e, int n) {
 }
 
 Entry* daughtrcStarbucks::getNearest(double x, double y) {
-	return search(x, y, sentinel, true);
+	return search(x, y, sentinel, true)->e;
 }
 
-Entry* daughtrcStarbucks::search(double x, double y, Node* currentNode, bool isXlevel) {
+Node* daughtrcStarbucks::search(double x, double y, Node* sentinel, bool isXlevel) {
 	// if currentNode is null return currentNode
-	if (currentNode == NULL)
-		return currentNode->e;
+	if (sentinel == NULL)
+		return sentinel;
 
 	// check if the currentNode is equal to the new position
-	if ((abs(currentNode->e->x-x) <= 0.00001) && (abs(currentNode->e->y-y) <= 0.00001))
-		return currentNode->e;
+	if ((abs(sentinel->e->x-x) <= 0.00001) && (abs(sentinel->e->y-y) <= 0.00001))
+		return sentinel;
 
 	// create two node* pointers
 	Node* bestLeft = NULL;
 	Node* bestRight = NULL;
 
 	// determine which side to go down
-	if (isXlevel == true && currentNode->e->x < x) {
-		bestLeft->e = search(x, y, currentNode->left, !isXlevel);
-	} else {
-		bestRight->e = search(x, y, currentNode->right, !isXlevel);
+	if (isXlevel) {
+		if (sentinel->e->x < x) 
+			bestLeft = search(x, y, sentinel->left, !isXlevel);
+		else 
+			bestRight = search(x, y, sentinel->right, !isXlevel);
+	}
+	else {
+		if (sentinel->e->y < y)
+			bestLeft = search(x, y, sentinel->left, !isXlevel);
+		else
+			bestRight = search(x, y, sentinel->right, !isXlevel);
 	}
 
-	if (isXlevel == false && currentNode->e->y < y) {
-		bestLeft->e = search(x, y, currentNode->left, !isXlevel);
-	} else {
-		bestRight->e = search(x, y, currentNode->right, !isXlevel);
-	}
+	if(bestLeft == NULL && bestRight == NULL)
+		return sentinel;
 
 	//decide which node to return
 	if (bestLeft == NULL && bestRight != NULL) {
-		if (getDistance(x, y, currentNode) > getDistance(x, y, bestRight))
-			return bestRight->e;
+		if (getDistance(x, y, sentinel) > getDistance(x, y, bestRight))
+			return bestRight;
 		else
-			return currentNode->e;
+			return sentinel;
 	} else if (bestLeft != NULL && bestRight == NULL) {
-		if (getDistance(x, y, currentNode) > getDistance(x, y, bestLeft))
-			return bestLeft->e;
+		if (getDistance(x, y, sentinel) > getDistance(x, y, bestLeft))
+			return bestLeft;
 		else
-			return currentNode->e;
+			return sentinel;
 	} else {
-		double shortestDistance = min(getDistance(x,y,currentNode),min(getDistance(x,y,bestRight),getDistance(x,y,bestLeft)));
-		if(shortestDistance == getDistance(x,y,currentNode))
-			return currentNode->e;
+		double shortestDistance = min(getDistance(x,y,sentinel),min(getDistance(x,y,bestRight),getDistance(x,y,bestLeft)));
+		if(shortestDistance == getDistance(x,y,sentinel))
+			return sentinel;
 		else if(shortestDistance == getDistance(x,y,bestRight))
-			return bestRight->e;
+			return bestRight;
 		else
-			return bestLeft->e;
+			return bestLeft;
 	}
 
 }

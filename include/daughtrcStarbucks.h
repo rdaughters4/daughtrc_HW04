@@ -25,7 +25,7 @@ class daughtrcStarbucks : public Starbucks {
 	  virtual void build(Entry* c, int n);
 	  virtual Entry* getNearest(double x, double y);
 	  Node* insert(Entry* newEntry, Node* currentNode, bool isXlevel);
-	  Entry* search(double x, double y, Node* currentNode, bool isXlevel);
+	  Node* search(double x, double y, Node* currentNode, bool isXlevel);
 	  double getDistance(double x, double y, Node* currentNode);
 	  void mix(Entry* entries, int length);
 
