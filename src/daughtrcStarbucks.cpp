@@ -1,9 +1,18 @@
+#pragma once
 #include "daughtrcStarbucks.h"
 #include <math.h>
+#include "cinder/Rand.h"
 
-daughtrcStarbucks::daughtrcStarbucks() {}
+Node::Node() {
+	left = NULL;
+	right = NULL;
+	e = NULL;
+}
 
-daughtrcStarbucks::~daughtrcStarbucks(void) {}
+Node::Node(Entry* e1) {
+	left = right = NULL;
+	e = e1;
+}
 
 void daughtrcStarbucks::build(Entry* c, int n) {
 	//create new array
@@ -23,11 +32,11 @@ void daughtrcStarbucks::build(Entry* c, int n) {
 		insert(&c[i], sentinel, true);
 }
 
-void daughtrcStarbucks::getNearest(double x, double y) {
+Entry* daughtrcStarbucks::getNearest(double x, double y) {
 	return search(x, y, sentinel, true)->e;
 }
 
-node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXlevel) {
+Node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXlevel) {
 	// check for empty node
 	if (currentNode == NULL)
 		return new node(newEntry); 

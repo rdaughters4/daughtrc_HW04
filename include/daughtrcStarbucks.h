@@ -1,19 +1,34 @@
 #pragma once
+#include <string>
 #include "Starbucks.h"
-#include "Node.h"
+#include "Resources.h"
+#include <string>
+#include "cinder/Rand.h"
+using namespace std;
+
+class Node {
+  public:
+	  Node* left;
+	  Node* right;
+	  Entry* e;
+
+	  Node();
+	  Node(Entry* e1);
+};
 
 class daughtrcStarbucks : public Starbucks {
-private:
-	Node* root;
 
-public:
-	daughtrcStarbucks();
-	~daughtrcStarbucks(void);
+  public:
+	  virtual void build(Entry* c, int n);
+	  virtual Entry* getNearest(double x, double y);
+	  Node* insert(Entry* newEntry, Node* currentNode, bool isXlevel);
+	  Entry* search(double x, double y, Node* currentNode, bool isXlevel);
+	  double distanceTo(double x, double y, Node* currentNode);
 
-	virtual void build(Entry* c, int n);
-	virtual Entry* getNearest(double x, double y);
-	Node* insert(Entry* newEntry, Node* currentNode, bool isXlevel);
-	Entry* search(double x, double y, Node* currentNode, bool isXlevel);
-	double distanceTo(double x, double y, Node* currentNode);
-
+  private:
+	  Entry* e;
+	  Node* sentinel;
+	  bool isXlevel;
+	  double x;
+	  double y;
 };

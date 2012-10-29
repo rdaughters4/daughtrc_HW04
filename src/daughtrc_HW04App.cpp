@@ -1,10 +1,11 @@
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "Starbucks.h"
+#include "daughtrcStarbucks.h"
+#include "Resources.h"
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "daughtrcStarbucks.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -16,6 +17,8 @@ class daughtrc_HW04App : public AppBasic {
 	void mouseDown( MouseEvent event );	
 	void update();
 	void draw();
+
+   private:
 
 };
 
@@ -52,6 +55,9 @@ void daughtrc_HW04App::setup()
 	for (int i = 0; i < storage.size(); i++)
 		list[i] = storage[i];
 
+
+
+	
 }
 
 void daughtrc_HW04App::mouseDown( MouseEvent event )
