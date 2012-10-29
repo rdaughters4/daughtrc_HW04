@@ -1,4 +1,5 @@
 #include "daughtrcStarbucks.h"
+#include <math.h>
 
 daughtrcStarbucks::daughtrcStarbucks() {}
 
@@ -19,10 +20,11 @@ void daughtrcStarbucks::build(Entry* c, int n) {
 
 	//build the k-d tree
 	for (int i = 1; i < n; i++)
-		insert(&c, sentinel, true);
+		insert(&c[i], sentinel, true);
 }
 
 void daughtrcStarbucks::getNearest(double x, double y) {
+	return search(x, y, sentinel, true)->e;
 }
 
 node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXlevel) {
@@ -52,6 +54,51 @@ node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXleve
 }
 
 void daughtrcStarbucks::search(double x, double y, Node* currentNode, bool isXlevel) {
+	// if currentNode is null return currentNode
+	if (currentNode == NULL)
+		return currentNode;
+
+	// check if the currentNode is equal to the new position
+	if ((abs(currentNode->e->x-x) <= 0.00001) && (abs(currentNode->e->y-y) <= 0.00001))
+		return currentNode;
+
+	// create two node* pointers
+	node* bestLeft = NULL;
+	node* bestRight = NULL;
+
+	// determine which side to go down
+	if (isXlevel == true && currentNode->e->x < x) {
+		bestLeft = search(x, y, currentNode->left, !isXlevel);
+	} else {
+		bestright = search(x, y, currentNode->right, !isXlevel);
+	}
+
+	if (isXlevel == false && currentNode->e->y < y) {
+		bestLeft = search(x, y, currentNode->left, !isXlevel);
+	} else {
+		bestright = search(x, y, currentNode->right, !isXlevel);
+	}
+
+	//decide which node to return
+	if (bestLeft == NULL && bestRight != NULL) {
+		if (distanceTo(x, y, currentNode) > distanceTo(x, y, bestRight))
+			return bestRight;
+		else
+			return currentNode;
+	} else if (bestLeft != NULL && bestRight == NULL) {
+		if (distanceTo(x, y, currentNode) > distanceTo(x, y, bestLeft))
+			return bestLeft;
+		else
+			return currentNode;
+	} else {
+		double shortestDistance = min(getDistance(x,y,currentNode),min(getDistance(x,y,bestRight),getDistance(x,y,bestLeft)));
+		if(shortestDistance == getDistance(x,y,currentNode))
+			return currentNode;
+		else if(shortestDistance == getDistance(x,y,bestRight))
+			return bestRight;
+		else
+			return bestLeft;
+	}
 
 }
 

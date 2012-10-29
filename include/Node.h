@@ -6,8 +6,8 @@ public:
 	  Node();
 	  Node(Entry* e1);
 
-	  Node* left_;
-	  Node* right_;
+	  Node* left;
+	  Node* right;
 	  Entry* e;
 
 };
