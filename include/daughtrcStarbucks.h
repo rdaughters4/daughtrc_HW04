@@ -12,7 +12,8 @@ public:
 
 	void build(Entry* c, int n);
 	Entry* getNearest(double x, double y);
-	Node* insert(Entry* e, Node* r, bool isXlevel);
-	Entry* search(double x, double y, Node* r, bool isXlevel);
+	Node* insert(Entry* newEntry, Node* currentNode, bool isXlevel);
+	Entry* search(double x, double y, Node* currentNode, bool isXlevel);
+	double distanceTo(double x, double y, Node* currentNode);
 
 };
