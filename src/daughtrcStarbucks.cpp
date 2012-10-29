@@ -14,105 +14,112 @@ Node::Node(Entry* e1) {
 	e = e1;
 }
 
-void daughtrcStarbucks::build(Entry* c, int n) {
-	//create new array
-	Entry arrayData = new Entry(n);
-
-	//copy the array to another array
-	for (int i = 0; i < n; i++) {
-		arrayData[i] = c[i];
-	}
-	c = arrayData;
-
-	// create sentinel node
-	sentinel = new Node(c);
-
-	//build the k-d tree
-	for (int i = 1; i < n; i++)
-		insert(&c[i], sentinel, true);
+daughtrcStarbucks::daughtrcStarbucks() {
 }
 
-Entry* daughtrcStarbucks::getNearest(double x, double y) {
-	return search(x, y, sentinel, true)->e;
+daughtrcStarbucks::~daughtrcStarbucks(void){
 }
 
 Node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXlevel) {
 	// check for empty node
 	if (currentNode == NULL)
-		return new node(newEntry); 
+		return new Node(newEntry); 
 
 	// check for duplicates
-	if (currentNode->e->x == NewEntry->x && currentNode->e->y == newEntry->y)
+	if (currentNode->e->x == newEntry->x && currentNode->e->y == newEntry->y)
 		return currentNode;
 
 	// on x level and new x is less than current x
-	if (bool isXlevel == true && newEntry->x < currentNode->e->x) {
-		r->left = insert(newEntry, currentNode, !isXlevel);
+	if ((isXlevel == true) && (newEntry->x < currentNode->e->x)) {
+		currentNode->left = insert(newEntry, currentNode, !isXlevel);
 	} else {
-		r->right = insert(newEntry, currentNode, !isXlevel);
+		currentNode->right = insert(newEntry, currentNode, !isXlevel);
 	}
 
 	// on y level and new y is less than current y
-	if (bool isXlevel == false && newEntry->y < currentNode->e->y) {
-		r->left = insert(newEntry, currentNode, !isXlevel);
+	if (isXlevel == false && newEntry->y < currentNode->e->y) {
+		currentNode->left = insert(newEntry, currentNode, !isXlevel);
 	} else {
-		r->right = insert(newEntry, currentNode, !isXlevel);
+		currentNode->right = insert(newEntry, currentNode, !isXlevel);
 	}
 
 	return currentNode;
 }
 
-void daughtrcStarbucks::search(double x, double y, Node* currentNode, bool isXlevel) {
+
+void daughtrcStarbucks::build(Entry* e, int n) {
+	//create new array
+	Entry* arrayData = new Entry();  // Used to be ...= new Entry(n);
+
+	//copy the array to another array
+	for (int i = 0; i < n; i++) {
+		arrayData[i] = e[i];
+	}
+	e = arrayData;
+
+	// create sentinel node
+	sentinel = new Node(e);
+
+	//build the k-d tree
+	for (int i = 1; i < n; i++)
+		insert(&e[i], sentinel, true);
+}
+
+Entry* daughtrcStarbucks::getNearest(double x, double y) {
+	return search(x, y, sentinel, true);
+}
+
+Entry* daughtrcStarbucks::search(double x, double y, Node* currentNode, bool isXlevel) {
 	// if currentNode is null return currentNode
 	if (currentNode == NULL)
-		return currentNode;
+		return currentNode->e;
 
 	// check if the currentNode is equal to the new position
 	if ((abs(currentNode->e->x-x) <= 0.00001) && (abs(currentNode->e->y-y) <= 0.00001))
-		return currentNode;
+		return currentNode->e;
 
 	// create two node* pointers
-	node* bestLeft = NULL;
-	node* bestRight = NULL;
+	Node* bestLeft = NULL;
+	Node* bestRight = NULL;
 
 	// determine which side to go down
 	if (isXlevel == true && currentNode->e->x < x) {
-		bestLeft = search(x, y, currentNode->left, !isXlevel);
+		bestLeft->e = search(x, y, currentNode->left, !isXlevel);
 	} else {
-		bestright = search(x, y, currentNode->right, !isXlevel);
+		bestRight->e = search(x, y, currentNode->right, !isXlevel);
 	}
 
 	if (isXlevel == false && currentNode->e->y < y) {
-		bestLeft = search(x, y, currentNode->left, !isXlevel);
+		bestLeft->e = search(x, y, currentNode->left, !isXlevel);
 	} else {
-		bestright = search(x, y, currentNode->right, !isXlevel);
+		bestRight->e = search(x, y, currentNode->right, !isXlevel);
 	}
 
 	//decide which node to return
 	if (bestLeft == NULL && bestRight != NULL) {
-		if (distanceTo(x, y, currentNode) > distanceTo(x, y, bestRight))
-			return bestRight;
+		if (getDistance(x, y, currentNode) > getDistance(x, y, bestRight))
+			return bestRight->e;
 		else
-			return currentNode;
+			return currentNode->e;
 	} else if (bestLeft != NULL && bestRight == NULL) {
-		if (distanceTo(x, y, currentNode) > distanceTo(x, y, bestLeft))
-			return bestLeft;
+		if (getDistance(x, y, currentNode) > getDistance(x, y, bestLeft))
+			return bestLeft->e;
 		else
-			return currentNode;
+			return currentNode->e;
 	} else {
 		double shortestDistance = min(getDistance(x,y,currentNode),min(getDistance(x,y,bestRight),getDistance(x,y,bestLeft)));
 		if(shortestDistance == getDistance(x,y,currentNode))
-			return currentNode;
+			return currentNode->e;
 		else if(shortestDistance == getDistance(x,y,bestRight))
-			return bestRight;
+			return bestRight->e;
 		else
-			return bestLeft;
+			return bestLeft->e;
 	}
 
 }
 
-double daughtrcStarbucks::distanceTo(double x, double y, Node* currentNode) {
-	return sqrt((x-currentNode->e->x)*(x-currentNode->e->x)+(y-currentNode->x->y)*(y-currentNode->e->y));
+double daughtrcStarbucks::getDistance(double x, double y, Node* currentNode) {
+	return sqrt((x-currentNode->e->x)*(x-currentNode->e->x)+(y-currentNode->e->y)*(y-currentNode->e->y));
 }
 
 

@@ -18,8 +18,8 @@ class daughtrc_HW04App : public AppBasic {
 	void update();
 	void draw();
 
-   private:
-
+private:
+	daughtrcStarbucks moo;
 };
 
 void daughtrc_HW04App::setup()

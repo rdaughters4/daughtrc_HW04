@@ -19,11 +19,13 @@ class Node {
 class daughtrcStarbucks : public Starbucks {
 
   public:
-	  virtual void build(Entry* c, int n);
-	  virtual Entry* getNearest(double x, double y);
+	  daughtrcStarbucks();
+	  ~daughtrcStarbucks(void);
+	  void build(Entry* c, int n);
+	  Entry* getNearest(double x, double y);
 	  Node* insert(Entry* newEntry, Node* currentNode, bool isXlevel);
 	  Entry* search(double x, double y, Node* currentNode, bool isXlevel);
-	  double distanceTo(double x, double y, Node* currentNode);
+	  double getDistance(double x, double y, Node* currentNode);
 
   private:
 	  Entry* e;
