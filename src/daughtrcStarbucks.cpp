@@ -49,7 +49,7 @@ Node* daughtrcStarbucks::insert(Entry* newEntry, Node* currentNode, bool isXleve
 
 void daughtrcStarbucks::build(Entry* e, int n) {
 	//create new array
-	Entry* arrayData = new Entry();  // Used to be ...= new Entry(n);
+	Entry* arrayData = new Entry[n];
 
 	//copy the array to another array
 	for (int i = 0; i < n; i++) {

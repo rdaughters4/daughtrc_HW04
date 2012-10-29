@@ -19,12 +19,13 @@ class daughtrc_HW04App : public AppBasic {
 	void draw();
 
 private:
-	daughtrcStarbucks moo;
+	daughtrcStarbucks* myTree;
 };
 
 void daughtrc_HW04App::setup()
 {
 	//logic taken from Matthew Dwyer
+	myTree = new daughtrcStarbucks();
 	ifstream in("Starbucks_2006.csv");
 	vector <Entry> storage;
 
@@ -55,6 +56,11 @@ void daughtrc_HW04App::setup()
 	for (int i = 0; i < storage.size(); i++)
 		list[i] = storage[i];
 
+
+	// build kd tree
+	myTree->build(list, count);
+
+	//console() << myTree->getNearest(0.741801952,0.79441292)->identifier << std::endl;
 
 
 	
