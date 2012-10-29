@@ -59,7 +59,7 @@ void daughtrc_HW04App::setup()
 	// build kd tree
 	myTree->build(list, count);
 
-	console() << myTree->getNearest(0.787693,0.62042)->identifier << std::endl;
+	console() << myTree->getNearest(0.3234234,0.09874351)->identifier << std::endl;
 
 
 	

@@ -72,6 +72,7 @@ Entry* daughtrcStarbucks::getNearest(double x, double y) {
 	return search(x, y, sentinel, true)->e;
 }
 
+//logic based off of Youxuan
 Node* daughtrcStarbucks::search(double x, double y, Node* sentinel, bool isXlevel) {
 	// if currentNode is null return currentNode
 	if (sentinel == NULL)
@@ -129,6 +130,7 @@ double daughtrcStarbucks::getDistance(double x, double y, Node* currentNode) {
 	return sqrt((x-currentNode->e->x)*(x-currentNode->e->x)+(y-currentNode->e->y)*(y-currentNode->e->y));
 }
 
+//taken from Youxuan
 void daughtrcStarbucks::mix(Entry* entries, int length){
 	int pick = 0;
 	for(int i=0;i<length-1;i++){
