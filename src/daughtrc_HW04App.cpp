@@ -22,6 +22,8 @@ class daughtrc_HW04App : public AppBasic {
 	void draw();
 	void drawLocations(Entry* locations, int numOfLocations);
 	void clearWindow(uint8_t* pixels);
+	void zoom();
+	void keyDown( KeyEvent event );
 
 private:
 	// declare window size
@@ -32,12 +34,17 @@ private:
 	// variables
 	Surface* mySurface_;
 	uint8_t* myPixels_;
+	Surface* zoomSurface;
+	uint8_t* zoomPixels;
 
 	// variables used for nearest location
 	double oldX;
 	double oldY;
 
-	// delace data structure variables
+	// variables used for zoom function
+	int zoomAmount;
+
+	// delacare data structure variables
 	daughtrcStarbucks* myTree;
 	Entry* bestLocation;
 };
@@ -50,9 +57,11 @@ void daughtrc_HW04App::prepareSettings(Settings* settings)
 
 void daughtrc_HW04App::setup()
 {
-	// initialize surface
+	// initialize surfaces
 	mySurface_ = new Surface(kSurfaceSize,kSurfaceSize,false);
 	myPixels_ = (*mySurface_).getData();
+	zoomSurface = new Surface(kSurfaceSize,kSurfaceSize,false);
+	zoomPixels = (*zoomSurface).getData();
 	
 	// clear window
 	clearWindow(myPixels_);
@@ -61,7 +70,11 @@ void daughtrc_HW04App::setup()
 	oldX = NULL;
 	oldY = NULL;
 
-	//logic taken from Matthew Dwyer
+	// initialize zoomAmount
+	zoomAmount = 1;
+
+	// logic taken from Matthew Dwyer
+	// read in starbucks locations from a file
 	myTree = new daughtrcStarbucks();
 	ifstream in("Starbucks_2006.csv");
 	vector <Entry> storage;
@@ -110,7 +123,7 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 	// redraw the old location back to green
 	if (oldX != NULL && oldY != NULL) {
 		Color c = Color(0,250,0);
-		int index = 3 * (oldX + oldY * kSurfaceSize);
+		int index = 3 * ((oldX/zoomAmount) + (oldY/zoomAmount) * kSurfaceSize);
 		myPixels_[index] = c.r;
 		myPixels_[index+1] = c.g;
 		myPixels_[index+2] = c.b;
@@ -131,17 +144,19 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 	int x = floor(xd);
 	double yd = nearestStarbucks->y*600;
 	int y = floor(600-yd);
-	int index = 3 * (x + y * kSurfaceSize);
+	int index = 3 * ((x/zoomAmount) + (y/zoomAmount) * kSurfaceSize);
 	myPixels_[index] = c.r;
 	myPixels_[index+1] = c.g;
 	myPixels_[index+2] = c.b;
 
 	oldX = x;
 	oldY = y;
+
 }
 
 void daughtrc_HW04App::update()
 {
+	zoom();
 }
 
 void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
@@ -158,6 +173,20 @@ void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
 	}
 }
 
+void daughtrc_HW04App::keyDown( KeyEvent event ) {
+	if (event.getCode() == KeyEvent::KEY_1) {
+		console() << "plus pressed" << endl;
+		zoomAmount *= 2;
+	}
+
+	if (event.getCode() == KeyEvent::KEY_2) {
+		if (zoomAmount != 1) {
+			console() << "minus pressed" << endl;
+			zoomAmount /= 2;
+		}
+	}
+}
+
 void daughtrc_HW04App::clearWindow(uint8_t* pixels){
 	Color c = Color(0, 0, 0);
 	for(int y = 0; y < kSurfaceSize; y++){
@@ -170,10 +199,23 @@ void daughtrc_HW04App::clearWindow(uint8_t* pixels){
 	}
 }
 
+void daughtrc_HW04App::zoom() {
+	for (int i = 0; i < kSurfaceSize; i++) {
+		for (int j = 0; j < kSurfaceSize; j++) {
+			int index = 3*(i + j * kSurfaceSize);
+			int index2 = 3*((i/zoomAmount) + (j/zoomAmount) * kSurfaceSize);
+
+			zoomPixels[index] = myPixels_[index2];
+			zoomPixels[index+1] = myPixels_[index2+1];
+			zoomPixels[index+2] = myPixels_[index2+2];
+		}
+	}
+}
+
 void daughtrc_HW04App::draw()
 {
 	// clear out the window with black
-	gl::draw(*mySurface_);
+	gl::draw(*zoomSurface);
 }
 
 CINDER_APP_BASIC( daughtrc_HW04App, RendererGl )
