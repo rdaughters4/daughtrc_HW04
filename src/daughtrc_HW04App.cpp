@@ -33,6 +33,10 @@ private:
 	Surface* mySurface_;
 	uint8_t* myPixels_;
 
+	// variables used for nearest location
+	double oldX;
+	double oldY;
+
 	// delace data structure variables
 	daughtrcStarbucks* myTree;
 	Entry* bestLocation;
@@ -52,6 +56,10 @@ void daughtrc_HW04App::setup()
 	
 	// clear window
 	clearWindow(myPixels_);
+
+	// initialize nearest location variables
+	oldX = NULL;
+	oldY = NULL;
 
 	//logic taken from Matthew Dwyer
 	myTree = new daughtrcStarbucks();
@@ -99,6 +107,15 @@ void daughtrc_HW04App::setup()
 
 void daughtrc_HW04App::mouseDown( MouseEvent event )
 {
+	// redraw the old location back to green
+	if (oldX != NULL && oldY != NULL) {
+		Color c = Color(0,250,0);
+		int index = 3 * (oldX + oldY * kSurfaceSize);
+		myPixels_[index] = c.r;
+		myPixels_[index+1] = c.g;
+		myPixels_[index+2] = c.b;
+	}
+
 	// store users click
 	double userX = event.getX();
 	double userY = event.getY();
@@ -118,6 +135,9 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 	myPixels_[index] = c.r;
 	myPixels_[index+1] = c.g;
 	myPixels_[index+2] = c.b;
+
+	oldX = x;
+	oldY = y;
 }
 
 void daughtrc_HW04App::update()
