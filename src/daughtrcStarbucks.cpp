@@ -3,7 +3,7 @@
 #include <math.h>
 #include "cinder/Rand.h"
 
-Node::Node() {
+/*Node::Node() {
 	left = NULL;
 	right = NULL;
 	e = NULL;
@@ -125,13 +125,13 @@ Node* daughtrcStarbucks::search(double x, double y, Node* sentinel, bool isXleve
 	}
 
 }
-
-double daughtrcStarbucks::getDistance(double x, double y, Node* currentNode) {
-	return sqrt((x-currentNode->e->x)*(x-currentNode->e->x)+(y-currentNode->e->y)*(y-currentNode->e->y));
+*/
+double daughtrcStarbucks::getDistance(double x, double y, double x2, double y2) {
+	return sqrt(((x-x2)*(x-x2))+((y-y2)*(y-y2)));
 }
 
 //taken from Youxuan
-void daughtrcStarbucks::mix(Entry* entries, int length){
+/*void daughtrcStarbucks::mix(Entry* entries, int length){
 	int pick = 0;
 	for(int i=0;i<length-1;i++){
 		pick = cinder::Rand::randInt(i+1,length);
@@ -139,6 +139,29 @@ void daughtrcStarbucks::mix(Entry* entries, int length){
 		entries[i] = entries[pick];
 		entries[pick] = temp;
 	}
+}*/
+
+void daughtrcStarbucks::build(Entry* c, int n) {
+	arrayLength = n;
+	dataStructureArray = new Entry[n];
+	for (int i = 0; i < arrayLength; i++) {
+		dataStructureArray[i] = c[i];
+	}
+}
+
+Entry* daughtrcStarbucks::getNearest(double x, double y) {
+	Entry* temp = new Entry();
+	Entry best = dataStructureArray[0];
+	double bestDistance = getDistance(dataStructureArray[0].x, dataStructureArray[0].y, x, y);
+	for (int i = 1; i < arrayLength; i++) {
+		double tempDistance = getDistance(dataStructureArray[i].x, dataStructureArray[i].y, x, y);
+		if (tempDistance < bestDistance) {
+			best = dataStructureArray[i];
+			bestDistance = tempDistance;
+		}
+	}
+	*temp = best;
+	return temp;
 }
 
 
