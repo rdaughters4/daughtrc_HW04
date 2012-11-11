@@ -104,16 +104,16 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 	double userY = event.getY();
 
 	//convert to floats
-	userX = userX/1000;
-	userY = 1-(userY/1000);
+	userX = userX/800;
+	userY = 1-(userY/600);
 
 	// change the color of the nearest starbucks location
 	Entry* nearestStarbucks = myTree->getNearest(userX, userY);
 	Color c = Color(250,0,0);
-	double xd = nearestStarbucks->x*1000;
+	double xd = nearestStarbucks->x*800;
 	int x = floor(xd);
-	double yd = nearestStarbucks->y*1000;
-	int y = floor(1000-yd);
+	double yd = nearestStarbucks->y*600;
+	int y = floor(600-yd);
 	int index = 3 * (x + y * kSurfaceSize);
 	myPixels_[index] = c.r;
 	myPixels_[index+1] = c.g;
@@ -127,10 +127,10 @@ void daughtrc_HW04App::update()
 void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
 	Color c = Color(0,250,0);
 	for (int i = 0; i < numOfLocations; i++) {
-		double xd = locations[i].x*1000;
+		double xd = locations[i].x*800;
 		int x = floor(xd);
-		double yd = locations[i].y*1000;
-		int y = floor(1000-yd);
+		double yd = locations[i].y*600;
+		int y = floor(600-yd);
 		int index = 3 * (x + y * kSurfaceSize);
 		myPixels_[index] = c.r;
 		myPixels_[index+1] = c.g;
