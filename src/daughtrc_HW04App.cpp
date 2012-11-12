@@ -25,6 +25,7 @@ class daughtrc_HW04App : public AppBasic {
 	void clearWindow(uint8_t* pixels);
 	void zoom();
 	void keyDown( KeyEvent event );
+	void drawCensusData(CensusData* locations, int numOfLocations);
 
 private:
 	// declare window size
@@ -103,24 +104,18 @@ void daughtrc_HW04App::setup()
 	}
 	// end reading in starbucks locations
 
+	// copy storage to an array of Entry objects
 	Entry* list = new Entry[storage.size()];
-
 	for (int i = 0; i < storage.size(); i++)
 		list[i] = storage[i];
-
-	// draw locations
-	drawLocations(list, count);
 
 	// build kd tree
 	myTree->build(list, count);
 	bestLocation = myTree->getNearest(0.323472,0.621797);
 
-	console() << bestLocation->identifier << std::endl;
-
 	// read in census 2000 data
 	ifstream in2("Census_2000.csv");
 	vector <CensusData> census2000;
-
 	int population;
 	double x_val;
 	double y_val;
@@ -147,9 +142,54 @@ void daughtrc_HW04App::setup()
 		in2 >> separate;
 		in2 >> y_val;		// y row
 		census2000[count2].y = y_val;
-		count++;
+		count2++;
 	}
 	// end reading in census 2000 data 
+
+	// copy census2000 to an array of CensusData objects
+	CensusData* censusData_2000 = new CensusData[census2000.size()];
+	for (int i = 0; i < census2000.size(); i++)
+		censusData_2000[i] = census2000[i];
+
+	// draw census2000
+	drawCensusData(censusData_2000, count2);
+
+	// draw locations
+	drawLocations(list, count);
+
+	/* read in census 2010 data
+	ifstream in3("Census_2010.csv");
+	vector <CensusData> census2010;
+
+	int population2;
+	double x_val2;
+	double y_val2;
+	int garbage2;
+	char separate2;
+	int count3 = 0;
+
+	while (in3.good()) {
+		CensusData* census = new CensusData();
+		census2010.push_back(*census);
+		in2 >> garbage2;		// first row
+		in2 >> separate2;
+		in2 >> garbage2;		// second row
+		in2 >> separate2;
+		in2 >> garbage2;		// third row
+		in2 >> separate2;
+		in2 >> garbage2;		// fourth row
+		in2 >> separate2;
+		in2 >> population2;	// population row
+		census2010[count3].population = population2;
+		in2 >> separate2;
+		in2 >> x_val2;		// x row
+		census2010[count2].x = x_val;
+		in2 >> separate;
+		in2 >> y_val;		// y row
+		census2000[count2].y = y_val;
+		count3++;
+	}
+	// end reading in census 2000 data */
 	
 }
 
@@ -244,6 +284,20 @@ void daughtrc_HW04App::zoom() {
 			zoomPixels[index+1] = myPixels_[index2+1];
 			zoomPixels[index+2] = myPixels_[index2+2];
 		}
+	}
+}
+
+void daughtrc_HW04App::drawCensusData(CensusData* locations, int numOfLocations) {
+	Color c = Color(255,255,255);
+	for (int i = 0; i < numOfLocations; i++) {
+		double xd = locations[i].x*800;
+		int x = floor(xd);
+		double yd = locations[i].y*600;
+		int y = floor(600-yd);
+		int index = 3 * (x + y * kSurfaceSize);
+		myPixels_[index] = c.r;
+		myPixels_[index+1] = c.g;
+		myPixels_[index+2] = c.b;
 	}
 }
 
