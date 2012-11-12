@@ -30,7 +30,7 @@ class daughtrc_HW04App : public AppBasic {
 	void keyDown( KeyEvent event );
 	void drawCensusData(CensusData* locations, int numOfLocations);
 	void drawCensusData2010(CensusData* locations, int numOfLocations);
-	void drawColorLocations(EntryColor* locations, int numOfLocations);
+	void drawPoint(double x, double y, EntryColor* data);
 
 private:
 	// declare window size
@@ -233,11 +233,23 @@ void daughtrc_HW04App::setup()
 	// draw locations
 	//drawLocations(list, count);
 
-	// draw colorLocations
-	drawColorLocations(colorList, count);
+	// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
+	for (int i = 0; i < census2000.size(); i++) {
+		CensusData* temp = &censusData_2000[i];
+		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+		drawPoint(temp->x, temp->y, startemp);
+	}
+
+	// draw colorLocations for census2010. This satisfies part C: visuals representation of starbucks locations
+	for (int i = 0; i < census2010.size(); i++) {
+		CensusData* temp = &censusData_2010[i];
+		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+		drawPoint(temp->x, temp->y, startemp);
+	}
 	
 }
 
+// this method satisfies part B: highlight nearest starbucks
 void daughtrc_HW04App::mouseDown( MouseEvent event )
 {
 	// redraw the old location back to green
@@ -293,6 +305,7 @@ void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
 	}
 }
 
+// this satisfies part D: Zoom feature
 void daughtrc_HW04App::keyDown( KeyEvent event ) {
 	if (event.getCode() == KeyEvent::KEY_1) {
 		console() << "plus pressed" << endl;
@@ -319,6 +332,7 @@ void daughtrc_HW04App::clearWindow(uint8_t* pixels){
 	}
 }
 
+// this helps to satisfy part D: Zoom feature
 void daughtrc_HW04App::zoom() {
 	for (int i = 0; i < kSurfaceSize; i++) {
 		for (int j = 0; j < kSurfaceSize; j++) {
@@ -360,18 +374,14 @@ void daughtrc_HW04App::drawCensusData2010(CensusData* locations, int numOfLocati
 	}
 }
 
-void daughtrc_HW04App::drawColorLocations(EntryColor* locations, int numOfLocations) {
-	for (int i = 0; i < numOfLocations; i++) {
-		Color c = Color(locations[i].red,locations[i].green,locations[i].blue);
-		double xd = locations[i].x*800;
-		int x = floor(xd);
-		double yd = locations[i].y*600;
-		int y = floor(600-yd);
-		int index = 3 * (x + y * kSurfaceSize);
-		myPixels_[index] = c.r;
-		myPixels_[index+1] = c.g;
-		myPixels_[index+2] = c.b;
-	}
+void daughtrc_HW04App::drawPoint(double x, double y, EntryColor* data) {
+	Color c = Color(data->red, data->green, data->blue);
+	int x1 = floor(x*800);
+	int y1 = floor(600-(y*600));
+	int index = 3*(x1 + y1 * kSurfaceSize);
+	myPixels_[index] = c.r;
+	myPixels_[index+1] = c.g;
+	myPixels_[index+2] = c.b;
 }
 
 void daughtrc_HW04App::draw()
