@@ -4,6 +4,7 @@
 #include "Starbucks.h"
 #include "daughtrcStarbucks.h"
 #include "Resources.h"
+#include "CensusData.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -73,9 +74,11 @@ void daughtrc_HW04App::setup()
 	// initialize zoomAmount
 	zoomAmount = 1;
 
+	// initialize myTree
+	myTree = new daughtrcStarbucks();
+
 	// logic taken from Matthew Dwyer
 	// read in starbucks locations from a file
-	myTree = new daughtrcStarbucks();
 	ifstream in("Starbucks_2006.csv");
 	vector <Entry> storage;
 
@@ -97,8 +100,8 @@ void daughtrc_HW04App::setup()
 		in >> y_value;
 		storage[count].y = y_value;
 		count++;
-
 	}
+	// end reading in starbucks locations
 
 	Entry* list = new Entry[storage.size()];
 
@@ -114,7 +117,39 @@ void daughtrc_HW04App::setup()
 
 	console() << bestLocation->identifier << std::endl;
 
+	// read in census 2000 data
+	ifstream in2("Census_2000.csv");
+	vector <CensusData> census2000;
 
+	int population;
+	double x_val;
+	double y_val;
+	int garbage;
+	char separate;
+	int count2 = 0;
+
+	while (in2.good()) {
+		CensusData* census = new CensusData();
+		census2000.push_back(*census);
+		in2 >> garbage;		// first row
+		in2 >> separate;
+		in2 >> garbage;		// second row
+		in2 >> separate;
+		in2 >> garbage;		// third row
+		in2 >> separate;
+		in2 >> garbage;		// fourth row
+		in2 >> separate;
+		in2 >> population;	// population row
+		census2000[count2].population = population;
+		in2 >> separate;
+		in2 >> x_val;		// x row
+		census2000[count2].x = x_val;
+		in2 >> separate;
+		in2 >> y_val;		// y row
+		census2000[count2].y = y_val;
+		count++;
+	}
+	// end reading in census 2000 data 
 	
 }
 
@@ -130,8 +165,8 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 	}
 
 	// store users click
-	double userX = event.getX();
-	double userY = event.getY();
+	double userX = event.getX()/zoomAmount;
+	double userY = event.getY()/zoomAmount;
 
 	//convert to floats
 	userX = userX/800;

@@ -108,6 +108,7 @@
     <ClCompile Include="..\src\daughtrc_HW04App.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\CensusData.h" />
     <ClInclude Include="..\include\daughtrcStarbucks.h" />
     <ClInclude Include="..\include\Resources.h" />
     <ClInclude Include="..\include\Starbucks.h" />
