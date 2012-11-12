@@ -26,6 +26,7 @@ class daughtrc_HW04App : public AppBasic {
 	void zoom();
 	void keyDown( KeyEvent event );
 	void drawCensusData(CensusData* locations, int numOfLocations);
+	void drawCensusData2010(CensusData* locations, int numOfLocations);
 
 private:
 	// declare window size
@@ -101,8 +102,7 @@ void daughtrc_HW04App::setup()
 		in >> y_value;
 		storage[count].y = y_value;
 		count++;
-	}
-	// end reading in starbucks locations
+	} // end reading in starbucks locations
 
 	// copy storage to an array of Entry objects
 	Entry* list = new Entry[storage.size()];
@@ -143,21 +143,14 @@ void daughtrc_HW04App::setup()
 		in2 >> y_val;		// y row
 		census2000[count2].y = y_val;
 		count2++;
-	}
-	// end reading in census 2000 data 
+	} // end reading in census 2000 data 
 
 	// copy census2000 to an array of CensusData objects
 	CensusData* censusData_2000 = new CensusData[census2000.size()];
 	for (int i = 0; i < census2000.size(); i++)
 		censusData_2000[i] = census2000[i];
 
-	// draw census2000
-	drawCensusData(censusData_2000, count2);
-
-	// draw locations
-	drawLocations(list, count);
-
-	/* read in census 2010 data
+	// read in census 2010 data
 	ifstream in3("Census_2010.csv");
 	vector <CensusData> census2010;
 
@@ -169,27 +162,40 @@ void daughtrc_HW04App::setup()
 	int count3 = 0;
 
 	while (in3.good()) {
-		CensusData* census = new CensusData();
-		census2010.push_back(*census);
-		in2 >> garbage2;		// first row
-		in2 >> separate2;
-		in2 >> garbage2;		// second row
-		in2 >> separate2;
-		in2 >> garbage2;		// third row
-		in2 >> separate2;
-		in2 >> garbage2;		// fourth row
-		in2 >> separate2;
-		in2 >> population2;	// population row
+		CensusData* census2 = new CensusData();
+		census2010.push_back(*census2);
+		in3 >> garbage2;		// first row
+		in3 >> separate2;
+		in3 >> garbage2;		// second row
+		in3 >> separate2;
+		in3 >> garbage2;		// third row
+		in3 >> separate2;
+		in3 >> garbage2;		// fourth row
+		in3 >> separate2;
+		in3 >> population2;	// population row
 		census2010[count3].population = population2;
-		in2 >> separate2;
-		in2 >> x_val2;		// x row
-		census2010[count2].x = x_val;
-		in2 >> separate;
-		in2 >> y_val;		// y row
-		census2000[count2].y = y_val;
+		in3 >> separate2;
+		in3 >> x_val2;		// x row
+		census2010[count3].x = x_val2;
+		in3 >> separate2;
+		in3 >> y_val2;		// y row
+		census2010[count3].y = y_val2;
 		count3++;
-	}
-	// end reading in census 2000 data */
+	} // end reading in census 2010 data
+
+	// copy census2010 to an array of CensusData objects
+	CensusData* censusData_2010 = new CensusData[census2010.size()];
+	for (int i = 0; i < census2010.size(); i++)
+		censusData_2010[i] = census2010[i];
+
+	// draw census2000
+	drawCensusData(censusData_2000, count2);
+
+	// draw census2010
+	drawCensusData2010(censusData_2010, count3);
+
+	// draw locations
+	drawLocations(list, count);
 	
 }
 
@@ -288,7 +294,21 @@ void daughtrc_HW04App::zoom() {
 }
 
 void daughtrc_HW04App::drawCensusData(CensusData* locations, int numOfLocations) {
-	Color c = Color(255,255,255);
+	Color c = Color(0,0,255);
+	for (int i = 0; i < numOfLocations; i++) {
+		double xd = locations[i].x*800;
+		int x = floor(xd);
+		double yd = locations[i].y*600;
+		int y = floor(600-yd);
+		int index = 3 * (x + y * kSurfaceSize);
+		myPixels_[index] = c.r;
+		myPixels_[index+1] = c.g;
+		myPixels_[index+2] = c.b;
+	}
+}
+
+void daughtrc_HW04App::drawCensusData2010(CensusData* locations, int numOfLocations) {
+	Color c = Color(255,75,0);
 	for (int i = 0; i < numOfLocations; i++) {
 		double xd = locations[i].x*800;
 		int x = floor(xd);
