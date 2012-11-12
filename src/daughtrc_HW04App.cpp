@@ -1,3 +1,17 @@
+/*
+ Welcome to the most roundabout program for solving nearestTo problems. If you're expecting
+ a program that builds quickly, this isn't the program for you. However, this program still
+ manages to accomplish part B, part C, part D, and part E for a total of 90 points. The final
+ 10 points comes from a youtube video displaying the program. When the program is intially built
+ it displays only the starbucks location and ignores census data. From here you can click
+ anywhere on the window and the nearest starbucks will turn red. In addition, you can press "1"
+ to zoom in and press "2" to zoom out. By pressing "3" and waiting somewhere around 3-5 minutes
+ the window will change to display part C. Pressing "4" and again waiting around 3-5 minutes
+ will display part E. Part E displays the population increase from 2000 to 2010 by block Id
+ as a green dot and population decrease by block ID as a red dot. Finally, pressing "5" will
+ and again waiting around 3-5 minutes will return you to the original display of starbucks locations.
+ I worked all night with Cary Willard, so many of our methods will be very similar in logic.
+*/
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
@@ -90,12 +104,6 @@ void daughtrc_HW04App::setup()
 	myPixels_ = (*mySurface_).getData();
 	zoomSurface = new Surface(kSurfaceSize,kSurfaceSize,false);
 	zoomPixels = (*zoomSurface).getData();
-
-	/*for (int w = 0; w < 800*600; w++) {
-		myPixels_[w] = mapPixels[w];
-	}*/
-
-
 
 	// initialize additional variables
 	totalPop2000 = new int[10];
@@ -254,65 +262,9 @@ void daughtrc_HW04App::setup()
 	censusData_2010 = new CensusData[census2010.size()];
 	for (int i = 0; i < census2010.size(); i++)
 		censusData_2010[i] = census2010[i];
-
-	// draw popDiff for 2000. Satisfies part E
-	for (int i = 0; i < census2000.size(); i++) {
-		CensusData* temp = &censusData_2000[i];
-		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-		int popDifference = totalPop2010[temp->blockID] - totalPop2000[temp->blockID];
-		if (popDifference > 0) {
-			startemp->green = 255;
-			startemp->red = 0;
-			startemp->blue = 0;
-		} else {
-			startemp->green = 0;
-			startemp->red = 255;
-			startemp->blue = 0;
-		}
-		drawPoint(temp->x, temp->y, startemp);
-	}
-
-	// draw popDiff for 2010. Satisfies part E
-	for (int i = 0; i < census2010.size(); i++) {
-		CensusData* temp = &censusData_2010[i];
-		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-		int popDifference = totalPop2010[temp->blockID] - totalPop2000[temp->blockID];
-		if (popDifference > 0) {
-			startemp->green = 255;
-			startemp->red = 0;
-			startemp->blue = 0;
-		} else {
-			startemp->green = 0;
-			startemp->red = 255;
-			startemp->blue = 0;
-		}
-		drawPoint(temp->x, temp->y, startemp);
-	}
-
-
-	// draw census2000
-	drawCensusData(censusData_2000, count2);
-
-	// draw census2010
-	drawCensusData2010(censusData_2010, count3);
-
+	
 	// draw locations
 	drawLocations(list, count);
-
-	// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
-	for (int i = 0; i < census2000.size(); i++) {
-		CensusData* temp = &censusData_2000[i];
-		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-		drawPoint(temp->x, temp->y, startemp);
-	}
-
-	// draw colorLocations for census2010. This satisfies part C: visuals representation of starbucks locations
-	for (int i = 0; i < census2010.size(); i++) {
-		CensusData* temp = &censusData_2010[i];
-		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-		drawPoint(temp->x, temp->y, startemp);
-	}
-	
 }
 
 // this method satisfies part B: highlight nearest starbucks
@@ -354,34 +306,7 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 
 void daughtrc_HW04App::update()
 {
-
-	/*if (justLocations == true) {
-		clearWindow(myPixels_);
-		drawLocations(list, storageCount);
-	}
-
-	if (censusData == true) {
-		clearWindow(myPixels_);
-		// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
-		for (int i = 0; i < census2000.size(); i++) {
-			CensusData* temp = &censusData_2000[i];
-			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-			drawPoint(temp->x, temp->y, startemp);
-		}
-
-		// draw colorLocations for census2010. This satisfies part C: visuals representation of starbucks locations
-		for (int i = 0; i < census2010.size(); i++) {
-			CensusData* temp = &censusData_2010[i];
-			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-			drawPoint(temp->x, temp->y, startemp);
-		}
-	}*/
-
 	zoom();
-
-	//justLocations = false;
-	//censusData = false;
-
 }
 
 void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
@@ -466,6 +391,7 @@ void daughtrc_HW04App::keyDown( KeyEvent event ) {
 
 	if (event.getCode() == KeyEvent::KEY_5) {
 		clearWindow(myPixels_);
+		// this helps satisfy part B
 		drawLocations(list, storageCount);
 	}
 }
