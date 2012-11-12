@@ -2,7 +2,6 @@
 #include <string>
 #include "Starbucks.h"
 #include "Resources.h"
-#include <string>
 #include "cinder/Rand.h"
 using namespace std;
 

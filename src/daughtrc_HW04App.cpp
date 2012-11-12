@@ -1,10 +1,13 @@
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
+#include "cinder/Rand.h"
 #include "Starbucks.h"
 #include "daughtrcStarbucks.h"
 #include "Resources.h"
 #include "CensusData.h"
+#include "StarbucksWithColor.h"
+#include "EntryColor.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -27,6 +30,7 @@ class daughtrc_HW04App : public AppBasic {
 	void keyDown( KeyEvent event );
 	void drawCensusData(CensusData* locations, int numOfLocations);
 	void drawCensusData2010(CensusData* locations, int numOfLocations);
+	void drawColorLocations(EntryColor* locations, int numOfLocations);
 
 private:
 	// declare window size
@@ -47,9 +51,14 @@ private:
 	// variables used for zoom function
 	int zoomAmount;
 
+	// variables used for colorEntry
+	int redCount;
+	int greenCount;
+	int blueCount;
+
 	// delacare data structure variables
 	daughtrcStarbucks* myTree;
-	Entry* bestLocation;
+	StarbucksWithColor* entryColorArr;
 };
 
 void daughtrc_HW04App::prepareSettings(Settings* settings)
@@ -76,8 +85,9 @@ void daughtrc_HW04App::setup()
 	// initialize zoomAmount
 	zoomAmount = 1;
 
-	// initialize myTree
+	// initialize myTree and entryColorArr
 	myTree = new daughtrcStarbucks();
+	entryColorArr = new StarbucksWithColor();
 
 	// logic taken from Matthew Dwyer
 	// read in starbucks locations from a file
@@ -109,9 +119,35 @@ void daughtrc_HW04App::setup()
 	for (int i = 0; i < storage.size(); i++)
 		list[i] = storage[i];
 
+	// copy storage to an array of EntryColor objects
+	redCount = 0;
+	greenCount = 75;
+	blueCount = 175;
+	EntryColor* colorList = new EntryColor[storage.size()];
+	for (int i = 0; i < storage.size(); i++) {
+		if (redCount > 255)
+			redCount = 0;
+		if (greenCount > 255)
+			greenCount = 0;
+		if (blueCount > 255)
+			blueCount = 0;
+		colorList[i].identifier = storage[i].identifier;
+		colorList[i].x = storage[i].x;
+		colorList[i].y = storage[i].y;
+		colorList[i].red = redCount;
+		colorList[i].green = greenCount;
+		colorList[i].blue = blueCount;
+		redCount++;
+		greenCount++;
+		blueCount++;
+	}
+
+
 	// build kd tree
 	myTree->build(list, count);
-	bestLocation = myTree->getNearest(0.323472,0.621797);
+
+	// build entryColorArr
+	entryColorArr->build(colorList, count);
 
 	// read in census 2000 data
 	ifstream in2("Census_2000.csv");
@@ -189,13 +225,16 @@ void daughtrc_HW04App::setup()
 		censusData_2010[i] = census2010[i];
 
 	// draw census2000
-	drawCensusData(censusData_2000, count2);
+	//drawCensusData(censusData_2000, count2);
 
 	// draw census2010
-	drawCensusData2010(censusData_2010, count3);
+	//drawCensusData2010(censusData_2010, count3);
 
 	// draw locations
-	drawLocations(list, count);
+	//drawLocations(list, count);
+
+	// draw colorLocations
+	drawColorLocations(colorList, count);
 	
 }
 
@@ -310,6 +349,20 @@ void daughtrc_HW04App::drawCensusData(CensusData* locations, int numOfLocations)
 void daughtrc_HW04App::drawCensusData2010(CensusData* locations, int numOfLocations) {
 	Color c = Color(255,75,0);
 	for (int i = 0; i < numOfLocations; i++) {
+		double xd = locations[i].x*800;
+		int x = floor(xd);
+		double yd = locations[i].y*600;
+		int y = floor(600-yd);
+		int index = 3 * (x + y * kSurfaceSize);
+		myPixels_[index] = c.r;
+		myPixels_[index+1] = c.g;
+		myPixels_[index+2] = c.b;
+	}
+}
+
+void daughtrc_HW04App::drawColorLocations(EntryColor* locations, int numOfLocations) {
+	for (int i = 0; i < numOfLocations; i++) {
+		Color c = Color(locations[i].red,locations[i].green,locations[i].blue);
 		double xd = locations[i].x*800;
 		int x = floor(xd);
 		double yd = locations[i].y*600;
