@@ -2,6 +2,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Rand.h"
+#include "cinder/ImageIo.h"
 #include "Starbucks.h"
 #include "daughtrcStarbucks.h"
 #include "Resources.h"
@@ -59,6 +60,20 @@ private:
 	// delacare data structure variables
 	daughtrcStarbucks* myTree;
 	StarbucksWithColor* entryColorArr;
+
+	// additional variables
+	Entry* list;
+	int storageCount;
+	bool justLocations;
+	bool censusData;
+	CensusData* censusData_2000;
+	CensusData* censusData_2010;
+	vector <CensusData> census2000;
+	vector <CensusData> census2010;
+	int* totalPop2000; 
+	int* totalPop2010;
+	int* popDiff;
+
 };
 
 void daughtrc_HW04App::prepareSettings(Settings* settings)
@@ -71,10 +86,23 @@ void daughtrc_HW04App::setup()
 {
 	// initialize surfaces
 	mySurface_ = new Surface(kSurfaceSize,kSurfaceSize,false);
+	//Surface map(loadImage( loadResource(RES_MY_RES) ));
+	//uint8_t* mapPixels = (map).getData();
 	myPixels_ = (*mySurface_).getData();
 	zoomSurface = new Surface(kSurfaceSize,kSurfaceSize,false);
 	zoomPixels = (*zoomSurface).getData();
-	
+
+	/*for (int w = 0; w < 800*600; w++) {
+		myPixels_[w] = mapPixels[w];
+	}*/
+
+
+
+	// initialize additional variables
+	totalPop2000 = new int[9];
+	totalPop2010 = new int[9];
+	popDiff = new int[9];
+
 	// clear window
 	clearWindow(myPixels_);
 
@@ -115,14 +143,15 @@ void daughtrc_HW04App::setup()
 	} // end reading in starbucks locations
 
 	// copy storage to an array of Entry objects
-	Entry* list = new Entry[storage.size()];
+	storageCount = count;
+	list = new Entry[storage.size()];
 	for (int i = 0; i < storage.size(); i++)
 		list[i] = storage[i];
 
 	// copy storage to an array of EntryColor objects
-	redCount = 0;
-	greenCount = 75;
-	blueCount = 175;
+	redCount = 85;
+	greenCount = 170;
+	blueCount = 255;
 	EntryColor* colorList = new EntryColor[storage.size()];
 	for (int i = 0; i < storage.size(); i++) {
 		if (redCount > 255)
@@ -151,10 +180,10 @@ void daughtrc_HW04App::setup()
 
 	// read in census 2000 data
 	ifstream in2("Census_2000.csv");
-	vector <CensusData> census2000;
 	int population;
 	double x_val;
 	double y_val;
+	int blockID;
 	int garbage;
 	char separate;
 	int count2 = 0;
@@ -168,7 +197,8 @@ void daughtrc_HW04App::setup()
 		in2 >> separate;
 		in2 >> garbage;		// third row
 		in2 >> separate;
-		in2 >> garbage;		// fourth row
+		in2 >> blockID;		// blockID row
+		census2000[count2].blockID = blockID;
 		in2 >> separate;
 		in2 >> population;	// population row
 		census2000[count2].population = population;
@@ -182,18 +212,26 @@ void daughtrc_HW04App::setup()
 	} // end reading in census 2000 data 
 
 	// copy census2000 to an array of CensusData objects
-	CensusData* censusData_2000 = new CensusData[census2000.size()];
+	censusData_2000 = new CensusData[census2000.size()];
 	for (int i = 0; i < census2000.size(); i++)
 		censusData_2000[i] = census2000[i];
 
+	// record totalPop for census 20000
+	for (int m = 1; m < 10; m++) {
+		for (int w = 0; w < census2000.size(); w++) {
+			if (censusData_2000[w].blockID == totalPop2000[m])
+				totalPop2000[m] += censusData_2000[w].population;
+		}
+	}
+
 	// read in census 2010 data
 	ifstream in3("Census_2010.csv");
-	vector <CensusData> census2010;
 
 	int population2;
 	double x_val2;
 	double y_val2;
 	int garbage2;
+	int blockID2;
 	char separate2;
 	int count3 = 0;
 
@@ -206,23 +244,70 @@ void daughtrc_HW04App::setup()
 		in3 >> separate2;
 		in3 >> garbage2;		// third row
 		in3 >> separate2;
-		in3 >> garbage2;		// fourth row
+		in3 >> blockID2;		// blockID
+		census2010[count3].blockID = blockID2;
 		in3 >> separate2;
-		in3 >> population2;	// population row
+		in3 >> population2;		// population row
 		census2010[count3].population = population2;
 		in3 >> separate2;
-		in3 >> x_val2;		// x row
+		in3 >> x_val2;			// x row
 		census2010[count3].x = x_val2;
 		in3 >> separate2;
-		in3 >> y_val2;		// y row
+		in3 >> y_val2;			// y row
 		census2010[count3].y = y_val2;
 		count3++;
 	} // end reading in census 2010 data
 
 	// copy census2010 to an array of CensusData objects
-	CensusData* censusData_2010 = new CensusData[census2010.size()];
+	censusData_2010 = new CensusData[census2010.size()];
 	for (int i = 0; i < census2010.size(); i++)
 		censusData_2010[i] = census2010[i];
+
+	// record totalPop for census 2010
+	for (int m = 1; m < 10; m++) {
+		for (int w = 0; w < census2010.size(); w++) {
+			if (censusData_2010[w].blockID == totalPop2010[m])
+				totalPop2010[m] += censusData_2010[w].population;
+		}
+	}
+
+	// find popDiff between 2000 and 2010
+	for (int c = 1; c < 10; c++) {
+		popDiff[c] = totalPop2000[c] - totalPop2010[c];
+	}
+
+	// draw popDiff for 2000
+	for (int i = 0; i < census2000.size(); i++) {
+		CensusData* temp = &censusData_2000[i];
+		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+		if (popDiff[temp->blockID] > 0) {
+			startemp->green = 255;
+			startemp->red = 0;
+			startemp->blue = 0;
+		} else {
+			startemp->green = 0;
+			startemp->red = 255;
+			startemp->blue = 0;
+		}
+		drawPoint(temp->x, temp->y, startemp);
+	}
+
+	// draw popDiff for 2010
+	for (int i = 0; i < census2010.size(); i++) {
+		CensusData* temp = &censusData_2010[i];
+		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+		if (popDiff[temp->blockID] > 0) {
+			startemp->green = 255;
+			startemp->red = 0;
+			startemp->blue = 0;
+		} else {
+			startemp->green = 0;
+			startemp->red = 255;
+			startemp->blue = 0;
+		}
+		drawPoint(temp->x, temp->y, startemp);
+	}
+
 
 	// draw census2000
 	//drawCensusData(censusData_2000, count2);
@@ -233,7 +318,7 @@ void daughtrc_HW04App::setup()
 	// draw locations
 	//drawLocations(list, count);
 
-	// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
+	/*// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
 	for (int i = 0; i < census2000.size(); i++) {
 		CensusData* temp = &censusData_2000[i];
 		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
@@ -245,7 +330,7 @@ void daughtrc_HW04App::setup()
 		CensusData* temp = &censusData_2010[i];
 		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
 		drawPoint(temp->x, temp->y, startemp);
-	}
+	} */
 	
 }
 
@@ -288,7 +373,34 @@ void daughtrc_HW04App::mouseDown( MouseEvent event )
 
 void daughtrc_HW04App::update()
 {
+
+	/*if (justLocations == true) {
+		clearWindow(myPixels_);
+		drawLocations(list, storageCount);
+	}
+
+	if (censusData == true) {
+		clearWindow(myPixels_);
+		// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
+		for (int i = 0; i < census2000.size(); i++) {
+			CensusData* temp = &censusData_2000[i];
+			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+			drawPoint(temp->x, temp->y, startemp);
+		}
+
+		// draw colorLocations for census2010. This satisfies part C: visuals representation of starbucks locations
+		for (int i = 0; i < census2010.size(); i++) {
+			CensusData* temp = &censusData_2010[i];
+			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+			drawPoint(temp->x, temp->y, startemp);
+		}
+	}*/
+
 	zoom();
+
+	//justLocations = false;
+	//censusData = false;
+
 }
 
 void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
@@ -308,15 +420,21 @@ void daughtrc_HW04App::drawLocations(Entry* locations, int numOfLocations) {
 // this satisfies part D: Zoom feature
 void daughtrc_HW04App::keyDown( KeyEvent event ) {
 	if (event.getCode() == KeyEvent::KEY_1) {
-		console() << "plus pressed" << endl;
 		zoomAmount *= 2;
 	}
 
 	if (event.getCode() == KeyEvent::KEY_2) {
 		if (zoomAmount != 1) {
-			console() << "minus pressed" << endl;
 			zoomAmount /= 2;
 		}
+	}
+
+	if (event.getCode() == KeyEvent::KEY_3) {
+		justLocations = true;
+	}
+
+	if (event.getCode() == KeyEvent::KEY_4) {
+		censusData = true;
 	}
 }
 
@@ -383,6 +501,7 @@ void daughtrc_HW04App::drawPoint(double x, double y, EntryColor* data) {
 	myPixels_[index+1] = c.g;
 	myPixels_[index+2] = c.b;
 }
+
 
 void daughtrc_HW04App::draw()
 {

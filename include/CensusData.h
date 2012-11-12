@@ -5,4 +5,5 @@ public:
 	int population;
 	double x;
 	double y;
+	int blockID;
 };
