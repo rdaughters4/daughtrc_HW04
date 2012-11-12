@@ -291,15 +291,15 @@ void daughtrc_HW04App::setup()
 
 
 	// draw census2000
-	//drawCensusData(censusData_2000, count2);
+	drawCensusData(censusData_2000, count2);
 
 	// draw census2010
-	//drawCensusData2010(censusData_2010, count3);
+	drawCensusData2010(censusData_2010, count3);
 
 	// draw locations
-	//drawLocations(list, count);
+	drawLocations(list, count);
 
-	/*// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
+	// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
 	for (int i = 0; i < census2000.size(); i++) {
 		CensusData* temp = &censusData_2000[i];
 		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
@@ -311,7 +311,7 @@ void daughtrc_HW04App::setup()
 		CensusData* temp = &censusData_2010[i];
 		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
 		drawPoint(temp->x, temp->y, startemp);
-	} */
+	}
 	
 }
 
@@ -411,11 +411,62 @@ void daughtrc_HW04App::keyDown( KeyEvent event ) {
 	}
 
 	if (event.getCode() == KeyEvent::KEY_3) {
-		justLocations = true;
+		clearWindow(myPixels_);
+		// draw colorLocations for census2000. This satisfies part C: Visual Representation of starbucks locations
+		for (int i = 0; i < census2000.size(); i++) {
+			CensusData* temp = &censusData_2000[i];
+			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+			drawPoint(temp->x, temp->y, startemp);
+		}
+
+		// draw colorLocations for census2010. This satisfies part C: visuals representation of starbucks locations
+		for (int i = 0; i < census2010.size(); i++) {
+			CensusData* temp = &censusData_2010[i];
+			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+			drawPoint(temp->x, temp->y, startemp);
+		}
 	}
 
 	if (event.getCode() == KeyEvent::KEY_4) {
-		censusData = true;
+		clearWindow(myPixels_);
+		// draw popDiff for 2000. Satisfies part E
+		for (int i = 0; i < census2000.size(); i++) {
+			CensusData* temp = &censusData_2000[i];
+			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+			int popDifference = totalPop2010[temp->blockID] - totalPop2000[temp->blockID];
+			if (popDifference > 0) {
+				startemp->green = 255;
+				startemp->red = 0;
+				startemp->blue = 0;
+			} else {
+				startemp->green = 0;
+				startemp->red = 255;
+				startemp->blue = 0;
+			}
+			drawPoint(temp->x, temp->y, startemp);
+		}
+
+		// draw popDiff for 2010. Satisfies part E
+		for (int i = 0; i < census2010.size(); i++) {
+			CensusData* temp = &censusData_2010[i];
+			EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
+			int popDifference = totalPop2010[temp->blockID] - totalPop2000[temp->blockID];
+			if (popDifference > 0) {
+				startemp->green = 255;
+				startemp->red = 0;
+				startemp->blue = 0;
+			} else {
+				startemp->green = 0;
+				startemp->red = 255;
+				startemp->blue = 0;
+			}
+			drawPoint(temp->x, temp->y, startemp);
+		}
+	}
+
+	if (event.getCode() == KeyEvent::KEY_5) {
+		clearWindow(myPixels_);
+		drawLocations(list, storageCount);
 	}
 }
 
