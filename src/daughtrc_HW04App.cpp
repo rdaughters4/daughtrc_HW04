@@ -72,7 +72,6 @@ private:
 	vector <CensusData> census2010;
 	int* totalPop2000; 
 	int* totalPop2010;
-	int* popDiff;
 
 };
 
@@ -99,9 +98,8 @@ void daughtrc_HW04App::setup()
 
 
 	// initialize additional variables
-	totalPop2000 = new int[9];
-	totalPop2010 = new int[9];
-	popDiff = new int[9];
+	totalPop2000 = new int[10];
+	totalPop2010 = new int[10];
 
 	// clear window
 	clearWindow(myPixels_);
@@ -208,6 +206,7 @@ void daughtrc_HW04App::setup()
 		in2 >> separate;
 		in2 >> y_val;		// y row
 		census2000[count2].y = y_val;
+		totalPop2000[blockID] += population;
 		count2++;
 	} // end reading in census 2000 data 
 
@@ -215,14 +214,6 @@ void daughtrc_HW04App::setup()
 	censusData_2000 = new CensusData[census2000.size()];
 	for (int i = 0; i < census2000.size(); i++)
 		censusData_2000[i] = census2000[i];
-
-	// record totalPop for census 20000
-	for (int m = 1; m < 10; m++) {
-		for (int w = 0; w < census2000.size(); w++) {
-			if (censusData_2000[w].blockID == totalPop2000[m])
-				totalPop2000[m] += censusData_2000[w].population;
-		}
-	}
 
 	// read in census 2010 data
 	ifstream in3("Census_2010.csv");
@@ -255,6 +246,7 @@ void daughtrc_HW04App::setup()
 		in3 >> separate2;
 		in3 >> y_val2;			// y row
 		census2010[count3].y = y_val2;
+		totalPop2010[blockID2] += population2;
 		count3++;
 	} // end reading in census 2010 data
 
@@ -263,24 +255,12 @@ void daughtrc_HW04App::setup()
 	for (int i = 0; i < census2010.size(); i++)
 		censusData_2010[i] = census2010[i];
 
-	// record totalPop for census 2010
-	for (int m = 1; m < 10; m++) {
-		for (int w = 0; w < census2010.size(); w++) {
-			if (censusData_2010[w].blockID == totalPop2010[m])
-				totalPop2010[m] += censusData_2010[w].population;
-		}
-	}
-
-	// find popDiff between 2000 and 2010
-	for (int c = 1; c < 10; c++) {
-		popDiff[c] = totalPop2000[c] - totalPop2010[c];
-	}
-
-	// draw popDiff for 2000
+	// draw popDiff for 2000. Satisfies part E
 	for (int i = 0; i < census2000.size(); i++) {
 		CensusData* temp = &censusData_2000[i];
 		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-		if (popDiff[temp->blockID] > 0) {
+		int popDifference = totalPop2010[temp->blockID] - totalPop2000[temp->blockID];
+		if (popDifference > 0) {
 			startemp->green = 255;
 			startemp->red = 0;
 			startemp->blue = 0;
@@ -292,11 +272,12 @@ void daughtrc_HW04App::setup()
 		drawPoint(temp->x, temp->y, startemp);
 	}
 
-	// draw popDiff for 2010
+	// draw popDiff for 2010. Satisfies part E
 	for (int i = 0; i < census2010.size(); i++) {
 		CensusData* temp = &censusData_2010[i];
 		EntryColor* startemp = entryColorArr->getNearest(temp->x, temp->y);
-		if (popDiff[temp->blockID] > 0) {
+		int popDifference = totalPop2010[temp->blockID] - totalPop2000[temp->blockID];
+		if (popDifference > 0) {
 			startemp->green = 255;
 			startemp->red = 0;
 			startemp->blue = 0;
